@@ -1,32 +1,53 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+    <!-- navbar -->
+    <navbar />
+    <!-- router view -->
+    <div class="page-wrapper">
+      <router-view />
     </div>
-    <router-view />
   </div>
 </template>
 
+<script>
+import Navbar from "@/components/Navbar";
+
+export default {
+  components: { Navbar },
+  created() {
+    if (this.$workbox) {
+      this.$workbox.addEventListener("waiting", () => {
+        this.showUpgradeUI = true;
+      });
+    }
+  },
+  methods: {
+    async accept() {
+      this.showUpgradeUI = false;
+      await this.$workbox.messageSW({ type: "SKIP_WAITING" });
+    }
+  }
+};
+</script>
+
 <style lang="scss">
+@import "styles/variables";
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+  height: 100vh;
+  overflow: hidden;
+  background: $background;
+  color: #5d5f62;
 
-#nav {
-  padding: 30px;
+  display: flex;
+  flex-direction: column;
 
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
+  .page-wrapper {
+    height: calc(100vh - 60px);
+    flex: 1;
+    overflow: hidden;
   }
 }
 </style>
